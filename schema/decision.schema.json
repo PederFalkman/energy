@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PederFalkman/advisory-governance/schema/decision.schema.json",
+  "title": "Decision",
+  "description": "An advisory decision record. Append-only and immutable once written. Holds a REFERENCE to its inputs, never a copy — see CONTRACT.md §2.",
+  "type": "object",
+  "required": ["decision_id", "made_at", "recommendation", "inputs", "versions"],
+  "additionalProperties": true,
+  "properties": {
+    "decision_id": {"type": "string", "minLength": 1},
+    "made_at": {"type": "string", "format": "date-time",
+                "description": "MUST be timezone-aware; a naive timestamp cannot be ordered against a settlement instant"},
+    "decision_type": {"type": ["string", "null"]},
+    "regime": {"type": ["string", "null"]},
+    "recommendation": {
+      "type": "object",
+      "required": ["scope", "subject", "subject_id", "statement"],
+      "properties": {
+        "scope": {"enum": ["GENERIC", "CLIENT_SPECIFIC"]},
+        "subject": {"enum": ["PHYSICAL_ASSET", "EXCHANGE_TRADED"]},
+        "subject_id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string"}
+      },
+      "not": {
+        "description": "The forbidden cell: client-specific advice on an exchange-traded instrument is investment advice under MiFID II Art. 4(1)(4). Schema-level refusal is a BACKSTOP — conformance requires that no type exists to construct it.",
+        "properties": {
+          "scope": {"const": "CLIENT_SPECIFIC"},
+          "subject": {"const": "EXCHANGE_TRADED"}
+        },
+        "required": ["scope", "subject"]
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["snapshot_id", "digest"],
+      "properties": {
+        "snapshot_id": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "minLength": 1,
+                   "description": "content digest proving what was used without storing it"},
+        "interval_count": {"type": "integer", "minimum": 0},
+        "source_labels": {"type": "array", "items": {"type": "string"}}
+      },
+      "not": {
+        "description": "Observations are referenced, never copied.",
+        "anyOf": [{"required": ["observations"]}, {"required": ["prices"]}]
+      }
+    },
+    "versions": {
+      "type": "object",
+      "required": ["model_version", "code_version"],
+      "properties": {
+        "model_version": {"type": "string", "minLength": 1},
+        "code_version": {"type": "string", "minLength": 1},
+        "lesson_set_version": {"type": "string"}
+      }
+    },
+    "envelope_id": {"type": "string"},
+    "data_rights": {
+      "type": "object",
+      "properties": {
+        "per_source": {"type": "array", "items": {
+          "type": "object",
+          "required": ["source", "decision"],
+          "properties": {
+            "source": {"type": "string"},
+            "decision": {"enum": ["PERMITTED", "DENIED", "UNKNOWN_FAIL_CLOSED", "EXPIRED_FAIL_CLOSED"]}
+          }}}
+      }
+    }
+  }
+}

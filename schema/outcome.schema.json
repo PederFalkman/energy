@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PederFalkman/advisory-governance/schema/outcome.schema.json",
+  "title": "Outcome",
+  "description": "The observable that settles a decision. Provenance MUST be OBSERVED — a modelled or interpolated value is not an outcome, and grading against our own model's number makes every lesson a confirmation of the model that produced it.",
+  "type": "object",
+  "required": ["decision_id", "judge_id", "source", "observed_at", "value", "unit", "provenance"],
+  "properties": {
+    "decision_id": {"type": "string", "minLength": 1},
+    "judge_id": {"type": "string", "minLength": 1},
+    "source": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "value": {"type": "number"},
+    "unit": {"type": "string", "minLength": 1},
+    "provenance": {"const": "OBSERVED",
+                   "description": "The only admissible value. MODELLED, INTERPOLATED and UNKNOWN are rejected at construction, not filtered later."},
+    "settlement_run": {"type": "string"}
+  }
+}

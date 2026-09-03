@@ -1,0 +1,15 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "advice_constructibility",
+  "note": "Every implementation reports, for each cell, whether a type exists that can construct it. CLIENT_SPECIFIC x EXCHANGE_TRADED must report constructible=false, and must do so because no type exists -- not because a check refused the call.",
+  "cases": [
+    {"case_id": "advice/generic-physical", "scope": "GENERIC", "subject": "PHYSICAL_ASSET",
+     "expected": {"constructible": true}},
+    {"case_id": "advice/generic-instrument", "scope": "GENERIC", "subject": "EXCHANGE_TRADED",
+     "expected": {"constructible": true}},
+    {"case_id": "advice/client-physical", "scope": "CLIENT_SPECIFIC", "subject": "PHYSICAL_ASSET",
+     "expected": {"constructible": true}},
+    {"case_id": "advice/client-instrument-FORBIDDEN", "scope": "CLIENT_SPECIFIC", "subject": "EXCHANGE_TRADED",
+     "expected": {"constructible": false, "reason": "investment advice under MiFID II Art. 4(1)(4); no type exists"}}
+  ]
+}

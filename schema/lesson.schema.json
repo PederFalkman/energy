@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PederFalkman/advisory-governance/schema/lesson.schema.json",
+  "title": "Lesson",
+  "description": "A methodological finding. Carries NO numeric field, so there is nothing on it to assign to a calculation input — see CONTRACT.md §2. Observation count lives on the admission record, not the lesson body, precisely so it cannot be mistaken for a tunable.",
+  "type": "object",
+  "required": ["lesson_id", "statement", "mechanism", "source_kind", "claim_kind", "admission"],
+  "properties": {
+    "lesson_id": {"type": "string", "minLength": 1},
+    "statement": {"type": "string", "minLength": 1},
+    "mechanism": {"type": "string"},
+    "source_kind": {"const": "DECISION_OUTCOME_PAIR",
+                    "description": "The only admissible derivation. CHAT, FETCHED_WEB and MODEL_GENERATED_TEXT are text about text, not evidence about the world."},
+    "claim_kind": {"enum": ["DATA_QUALITY", "ESTIMATION_METHOD", "PROCESS_SEQUENCING",
+                            "CONSTRAINT_HANDLING", "RECONCILIATION", "TIMING_CONVENTION", "TOOLING"]},
+    "applies_to": {"type": "array", "items": {"type": "string"}},
+    "admission": {
+      "type": "object",
+      "required": ["judge_id", "decision_ids", "observation_count", "regime", "regime_is_stale"],
+      "properties": {
+        "judge_id": {"type": "string", "minLength": 1},
+        "decision_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "observation_count": {"type": "integer", "minimum": 1},
+        "regime": {"type": "string"},
+        "regime_is_stale": {"type": "boolean"}
+      }
+    }
+  },
+  "propertyNames": {
+    "not": {"enum": ["threshold", "weight", "coefficient", "ratio", "parameter", "limit", "factor"]},
+    "description": "A lesson may not carry a tunable by name either. The type-level guarantee is no numeric field; this is the serialised backstop."
+  }
+}
