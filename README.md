@@ -8,7 +8,7 @@ Two implementations exist:
 | Repo | Implementation |
 |---|---|
 | `markets` | `src/markets/decision/` |
-| `ato-energy-platform` | `platform/services/advisory-governance/` |
+| `ato-energy-platform` | `platform/shared/advisory_governance/` |
 
 **Neither implementation depends on the other.** They depend on this contract,
 which is the point: advice is not grid truth, and making `markets` import a
