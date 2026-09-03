@@ -1,148 +1,290 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "kind": "lesson_admission",
   "note": "Each case is evaluated by the implementation's admission gate. It reports {admitted, reason, stale}. `reason` is null when admitted. Evaluation order is normative (CONTRACT.md 3.2) and decides which reason wins when several conditions fail.",
   "defaults": {
-    "registered_judges": ["day_ahead_outturn", "imbalance_settlement", "realised_curtailment", "measured_thermal_loading"],
+    "registered_judges": [
+      "day_ahead_outturn",
+      "imbalance_settlement",
+      "realised_curtailment",
+      "measured_thermal_loading"
+    ],
     "actor_role": "advanced_editor",
     "source_kind": "DECISION_OUTCOME_PAIR",
     "claim_kind": "PROCESS_SEQUENCING",
-    "outcome": {"judge_id": "realised_curtailment", "provenance": "OBSERVED"},
-    "decisions": [{"decision_id": "d-1", "regime": "mtu_15min"}],
+    "outcome": {
+      "judge_id": "realised_curtailment",
+      "provenance": "OBSERVED"
+    },
+    "decisions": [
+      {
+        "decision_id": "d-1",
+        "regime": "mtu_15min"
+      }
+    ],
     "calendar_complete": true,
     "party_names": []
   },
   "cases": [
-    {"case_id": "admit/method-note",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "a redundant constraint makes the system singular",
-     "expected": {"admitted": true, "reason": null, "stale": false}},
-
-    {"case_id": "admit/timing-convention",
-     "statement": "a DST day is 23 or 25 hours and the axis must reflect it",
-     "mechanism": "subtracting two aware datetimes sharing a tzinfo gives wall-clock hours",
-     "claim_kind": "TIMING_CONVENTION",
-     "expected": {"admitted": true, "reason": null, "stale": false}},
-
-    {"case_id": "reject/no-registered-judge",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical",
-     "outcome": {"judge_id": "a_judge_we_invented", "provenance": "OBSERVED"},
-     "expected": {"admitted": false, "reason": "NO_REGISTERED_JUDGE"}},
-
-    {"case_id": "reject/outcome-modelled",
-     "statement": "the estimator drifts when the window is short",
-     "mechanism": "mechanical",
-     "outcome": {"judge_id": "realised_curtailment", "provenance": "MODELLED"},
-     "expected": {"admitted": false, "reason": "OUTCOME_NOT_OBSERVED"}},
-
-    {"case_id": "reject/outcome-interpolated-curve-point",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical",
-     "outcome": {"judge_id": "day_ahead_outturn", "provenance": "INTERPOLATED"},
-     "expected": {"admitted": false, "reason": "OUTCOME_NOT_OBSERVED"},
-     "adversarial": "an outcome that is an interpolated curve point"},
-
-    {"case_id": "reject/derived-from-chat",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical", "source_kind": "CHAT",
-     "expected": {"admitted": false, "reason": "UNTRUSTED_DERIVATION"}},
-
-    {"case_id": "reject/derived-from-model-text",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical", "source_kind": "MODEL_GENERATED_TEXT",
-     "expected": {"admitted": false, "reason": "UNTRUSTED_DERIVATION"},
-     "adversarial": "a lesson derived from model-generated text"},
-
-    {"case_id": "reject/derived-from-web",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical", "source_kind": "FETCHED_WEB",
-     "expected": {"admitted": false, "reason": "UNTRUSTED_DERIVATION"}},
-
-    {"case_id": "reject/no-evidence",
-     "statement": "the reconciliation step is the usual failure point",
-     "mechanism": "mechanical", "outcomes_empty": true,
-     "expected": {"admitted": false, "reason": "NO_EVIDENCE"}},
-
-    {"case_id": "reject/names-a-client",
-     "statement": "Nordkraft responded slowly to instructions",
-     "mechanism": "mechanical", "party_names": ["Nordkraft"],
-     "expected": {"admitted": false, "reason": "NAMES_A_PARTY"}},
-
-    {"case_id": "reject/names-a-company-by-suffix",
-     "statement": "Vattenfall AB responded slowly",
-     "mechanism": "mechanical",
-     "expected": {"admitted": false, "reason": "NAMES_A_PARTY"}},
-
-    {"case_id": "reject/names-a-person-by-email",
-     "statement": "the step is the usual failure point",
-     "mechanism": "reported by ops@example.com",
-     "expected": {"admitted": false, "reason": "NAMES_A_PARTY"}},
-
-    {"case_id": "reject/mechanics-phrasing-carrying-a-view",
-     "statement": "the estimator shows spreads widen systematically into winter",
-     "mechanism": "observed across the sample",
-     "expected": {"admitted": false, "reason": "MARKET_VIEW"},
-     "adversarial": "phrased as mechanics, carries a directional view"},
-
-    {"case_id": "reject/forecast-phrased-as-mechanism",
-     "statement": "the mechanism implies the basis will strengthen",
-     "mechanism": "structural",
-     "expected": {"admitted": false, "reason": "MARKET_VIEW"}},
-
-    {"case_id": "reject/valuation-claim",
-     "statement": "EPADs are cheap right now",
-     "mechanism": "observed",
-     "expected": {"admitted": false, "reason": "MARKET_VIEW"},
-     "adversarial": "a view containing no direction word"},
-
-    {"case_id": "reject/relative-value-claim",
-     "statement": "winter contracts trade at a premium to summer",
-     "mechanism": "observed",
-     "expected": {"admitted": false, "reason": "MARKET_VIEW"}},
-
-    {"case_id": "reject/trading-instruction",
-     "statement": "method note: buy the front quarter when liquidity thins",
-     "mechanism": "the pattern recurred",
-     "expected": {"admitted": false, "reason": "OPINION_SHAPED"}},
-
-    {"case_id": "reject/role-viewer-may-not-admit",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "mechanical", "actor_role": "viewer",
-     "expected": {"admitted": false, "reason": "ROLE_NOT_PERMITTED"}},
-
-    {"case_id": "reject/role-editor-may-not-admit",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "mechanical", "actor_role": "editor",
-     "expected": {"admitted": false, "reason": "ROLE_NOT_PERMITTED"}},
-
-    {"case_id": "admit/role-admin-may-admit",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "mechanical", "actor_role": "admin",
-     "expected": {"admitted": true, "reason": null, "stale": false}},
-
-    {"case_id": "order/role-precedes-content",
-     "statement": "EPADs are cheap right now",
-     "mechanism": "observed", "actor_role": "viewer",
-     "expected": {"admitted": false, "reason": "ROLE_NOT_PERMITTED"},
-     "note": "both role and content fail; evaluation order 3.2 makes role win"},
-
-    {"case_id": "order/derivation-precedes-lexical",
-     "statement": "spreads widen into winter",
-     "mechanism": "observed", "source_kind": "CHAT",
-     "expected": {"admitted": false, "reason": "UNTRUSTED_DERIVATION"},
-     "note": "rejected for where it came from, not for the word it contains"},
-
-    {"case_id": "stale/incomplete-calendar-is-never-current",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "mechanical", "calendar_complete": false,
-     "expected": {"admitted": true, "reason": null, "stale": true},
-     "note": "an undated boundary could sit anywhere; no lesson may be reported confidently current"},
-
-    {"case_id": "stale/unknown-regime",
-     "statement": "the cascade check runs before the fit",
-     "mechanism": "mechanical",
-     "decisions": [{"decision_id": "d-1", "regime": "REGIME_UNKNOWN"}],
-     "expected": {"admitted": true, "reason": null, "stale": true}}
+    {
+      "case_id": "admit/method-note",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "a redundant constraint makes the system singular",
+      "expected": {
+        "admitted": true,
+        "reason": null,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "admit/timing-convention",
+      "statement": "a DST day is 23 or 25 hours and the axis must reflect it",
+      "mechanism": "subtracting two aware datetimes sharing a tzinfo gives wall-clock hours",
+      "claim_kind": "TIMING_CONVENTION",
+      "expected": {
+        "admitted": true,
+        "reason": null,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "reject/no-registered-judge",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "outcome": {
+        "judge_id": "a_judge_we_invented",
+        "provenance": "OBSERVED"
+      },
+      "expected": {
+        "admitted": false,
+        "reason": "NO_REGISTERED_JUDGE"
+      }
+    },
+    {
+      "case_id": "reject/outcome-modelled",
+      "statement": "the estimator drifts when the window is short",
+      "mechanism": "mechanical",
+      "outcome": {
+        "judge_id": "realised_curtailment",
+        "provenance": "MODELLED"
+      },
+      "expected": {
+        "admitted": false,
+        "reason": "OUTCOME_NOT_OBSERVED"
+      }
+    },
+    {
+      "case_id": "reject/outcome-interpolated-curve-point",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "outcome": {
+        "judge_id": "day_ahead_outturn",
+        "provenance": "INTERPOLATED"
+      },
+      "expected": {
+        "admitted": false,
+        "reason": "OUTCOME_NOT_OBSERVED"
+      },
+      "adversarial": "an outcome that is an interpolated curve point"
+    },
+    {
+      "case_id": "reject/derived-from-chat",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "source_kind": "CHAT",
+      "expected": {
+        "admitted": false,
+        "reason": "UNTRUSTED_DERIVATION"
+      }
+    },
+    {
+      "case_id": "reject/derived-from-model-text",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "source_kind": "MODEL_GENERATED_TEXT",
+      "expected": {
+        "admitted": false,
+        "reason": "UNTRUSTED_DERIVATION"
+      },
+      "adversarial": "a lesson derived from model-generated text"
+    },
+    {
+      "case_id": "reject/derived-from-web",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "source_kind": "FETCHED_WEB",
+      "expected": {
+        "admitted": false,
+        "reason": "UNTRUSTED_DERIVATION"
+      }
+    },
+    {
+      "case_id": "reject/no-evidence",
+      "statement": "the reconciliation step is the usual failure point",
+      "mechanism": "mechanical",
+      "outcomes_empty": true,
+      "expected": {
+        "admitted": false,
+        "reason": "NO_EVIDENCE"
+      }
+    },
+    {
+      "case_id": "reject/names-a-client",
+      "statement": "Nordkraft responded slowly to instructions",
+      "mechanism": "mechanical",
+      "party_names": [
+        "Nordkraft"
+      ],
+      "expected": {
+        "admitted": false,
+        "reason": "NAMES_A_PARTY"
+      }
+    },
+    {
+      "case_id": "reject/names-a-company-by-suffix",
+      "statement": "Vattenfall AB responded slowly",
+      "mechanism": "mechanical",
+      "expected": {
+        "admitted": false,
+        "reason": "NAMES_A_PARTY"
+      }
+    },
+    {
+      "case_id": "reject/names-a-person-by-email",
+      "statement": "the step is the usual failure point",
+      "mechanism": "reported by ops@example.com",
+      "expected": {
+        "admitted": false,
+        "reason": "NAMES_A_PARTY"
+      }
+    },
+    {
+      "case_id": "reject/mechanics-phrasing-carrying-a-view",
+      "statement": "the estimator shows spreads widen systematically into winter",
+      "mechanism": "observed across the sample",
+      "expected": {
+        "admitted": false,
+        "reason": "MARKET_VIEW"
+      },
+      "adversarial": "phrased as mechanics, carries a directional view"
+    },
+    {
+      "case_id": "reject/forecast-phrased-as-mechanism",
+      "statement": "the mechanism implies the basis will strengthen",
+      "mechanism": "structural",
+      "expected": {
+        "admitted": false,
+        "reason": "MARKET_VIEW"
+      }
+    },
+    {
+      "case_id": "reject/valuation-claim",
+      "statement": "EPADs are cheap right now",
+      "mechanism": "observed",
+      "expected": {
+        "admitted": false,
+        "reason": "MARKET_VIEW"
+      },
+      "adversarial": "a view containing no direction word"
+    },
+    {
+      "case_id": "reject/relative-value-claim",
+      "statement": "winter contracts trade at a premium to summer",
+      "mechanism": "observed",
+      "expected": {
+        "admitted": false,
+        "reason": "MARKET_VIEW"
+      }
+    },
+    {
+      "case_id": "reject/trading-instruction",
+      "statement": "method note: buy the front quarter when liquidity thins",
+      "mechanism": "the pattern recurred",
+      "expected": {
+        "admitted": false,
+        "reason": "OPINION_SHAPED"
+      }
+    },
+    {
+      "case_id": "reject/role-viewer-may-not-admit",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "mechanical",
+      "actor_role": "viewer",
+      "expected": {
+        "admitted": false,
+        "reason": "ROLE_NOT_PERMITTED"
+      }
+    },
+    {
+      "case_id": "reject/role-editor-may-not-admit",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "mechanical",
+      "actor_role": "editor",
+      "expected": {
+        "admitted": false,
+        "reason": "ROLE_NOT_PERMITTED"
+      }
+    },
+    {
+      "case_id": "admit/role-admin-may-admit",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "mechanical",
+      "actor_role": "admin",
+      "expected": {
+        "admitted": true,
+        "reason": null,
+        "stale": false
+      }
+    },
+    {
+      "case_id": "order/role-precedes-content",
+      "statement": "EPADs are cheap right now",
+      "mechanism": "observed",
+      "actor_role": "viewer",
+      "expected": {
+        "admitted": false,
+        "reason": "ROLE_NOT_PERMITTED"
+      },
+      "note": "both role and content fail; evaluation order 3.2 makes role win"
+    },
+    {
+      "case_id": "order/derivation-precedes-lexical",
+      "statement": "spreads widen into winter",
+      "mechanism": "observed",
+      "source_kind": "CHAT",
+      "expected": {
+        "admitted": false,
+        "reason": "UNTRUSTED_DERIVATION"
+      },
+      "note": "rejected for where it came from, not for the word it contains"
+    },
+    {
+      "case_id": "stale/incomplete-calendar-is-never-current",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "mechanical",
+      "calendar_complete": false,
+      "expected": {
+        "admitted": true,
+        "reason": null,
+        "stale": true
+      },
+      "note": "an undated boundary could sit anywhere; no lesson may be reported confidently current"
+    },
+    {
+      "case_id": "stale/unknown-regime",
+      "statement": "the cascade check runs before the fit",
+      "mechanism": "mechanical",
+      "decisions": [
+        {
+          "decision_id": "d-1",
+          "regime": "REGIME_UNKNOWN"
+        }
+      ],
+      "expected": {
+        "admitted": true,
+        "reason": null,
+        "stale": true
+      }
+    }
   ]
 }

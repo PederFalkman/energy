@@ -1,4 +1,4 @@
-# Advisory governance contract — v1.0.0
+# Advisory governance contract — v1.1.0
 
 Normative. Where this document and an implementation disagree, this document is
 correct and the implementation has a defect.
@@ -29,14 +29,33 @@ A client-specific recommendation on a financial instrument is investment advice
 under MiFID II Art. 4(1)(4), which Layer is not authorised to give.
 
 **Conformance requirement.** An implementation MUST NOT provide a constructor,
-factory, builder or deserialiser that yields the forbidden pair. Refusing it at
-call time is **not** conformant: the requirement is that the type does not
-exist. Adding it must require deleting or editing a type declaration, so the
-capability cannot be gained by forgetting a policy.
+factory, builder or deserialiser that yields an *instance* of the forbidden pair.
+Adding the capability must require deleting or editing a type declaration, so it
+cannot be gained by forgetting a policy.
 
-An implementation SHOULD fail at the earliest moment its language allows — class
-definition, compile, or module load — and MUST NOT fail only when advice is
-emitted.
+**The cell SHOULD be occupied by a named uninhabited type, not left absent.**
+This was amended in v1.1.0 after two independent implementations of this
+contract disagreed, and the second one's reasoning was better: *a cell merely
+missing from the table is indistinguishable from an oversight, and a later
+contributor would "complete" it.* A named type — `InvestmentAdviceNotOffered` or
+equivalent — whose constructor raises documents the refusal in the place someone
+would look to add it, and enabling the capability then means **deleting a class**,
+which shows up in a diff.
+
+An uninhabited type is not the same as a call-time check, and the distinction
+matters: the type has no instances *ever*, for any caller, so there is no code
+path that yields one. A guard that could be reached with the right arguments
+would not be conformant.
+
+Two further requirements, so the uninhabited type does not become the only
+control:
+
+- The forbidden pair MUST NOT be reachable through any factory or type table
+  that returns constructible types.
+- An implementation MUST prevent a *new* type from claiming the forbidden pair —
+  in a language with subclass hooks, by refusing such a declaration at
+  class-definition time. Occupying the cell stops it being filled by omission;
+  this stops it being filled by addition.
 
 ### 1.2 Numeric values never pass through a language model
 
@@ -209,15 +228,22 @@ Four regimes are declared: `flow_based` (flow-based capacity calculation
 go-live), `mfrr_eam` (mFRR energy activation market), `mtu_15min` (15-minute
 market time unit), `intraday_gate_closure` (intraday gate-closure reform).
 
-**Only one date is known to this contract:** `mtu_15min` = `2025-10-01`, and even
-that is unverified against the market operator's publication.
+**No date is known to this contract**, and as of v1.1.0 an implementation MUST
+NOT hold one. The "April report" the four regimes were said to come from is not
+present in any repository here.
 
-The other three have **no date in any repository here**. The "April report" they
-were said to come from is not present. This contract therefore requires the
-calendar be **supplied, not baked**: an implementation MUST treat undated
+The calendar is **supplied, not baked**: an implementation MUST treat undated
 regimes as undated, MUST resolve an instant that could fall inside an undated
 regime to `REGIME_UNKNOWN`, and MUST NOT infer a boundary date. Supplying a date
 MUST require a cited source.
+
+**A regime module MUST contain no date literal**, and an implementation SHOULD
+assert this mechanically — a test that scans the module for one. v1.0.0 permitted
+`mtu_15min` = `2025-10-01` as a documented default; that was wrong in kind rather
+than in value. A date carried in code is a date someone will trust, and the only
+honest posture for a module that cannot cite a source is to hold nothing. With no
+calendar configured an implementation surfaces nothing as current: a store that
+cannot establish currency does not get to assume it.
 
 A wrong boundary date produces a confident wrong staleness label, which is worse
 than an admitted unknown.

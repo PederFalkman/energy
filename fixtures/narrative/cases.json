@@ -1,38 +1,128 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "kind": "narrative_seam",
   "note": "direction=outbound tests what may be placed on the brief crossing into the model. direction=inbound tests generated text coming back. The inbound rule is stricter by design: ANY digit outside a placeholder is refused.",
   "cases": [
-    {"case_id": "narrative/out-plain-text", "direction": "outbound", "payload": "the window was short",
-     "expected": {"refused": false}},
-    {"case_id": "narrative/out-decimal", "direction": "outbound", "payload": "the price was 41.20",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-comma-decimal", "direction": "outbound", "payload": "the spread was 3,5",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-unit-mw", "direction": "outbound", "payload": "50MW was available",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-unit-spaced", "direction": "outbound", "payload": "40 EUR/MWh",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-percent", "direction": "outbound", "payload": "utilisation 7%",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-float-value", "direction": "outbound", "payload_number": 41.2,
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-int-value", "direction": "outbound", "payload_number": 41,
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-zero", "direction": "outbound", "payload_number": 0,
-     "expected": {"refused": true}},
-    {"case_id": "narrative/out-bool-is-not-a-quantity", "direction": "outbound", "payload_bool": true,
-     "expected": {"refused": false}},
-
-    {"case_id": "narrative/in-placeholder-only", "direction": "inbound", "payload": "It delivered {{value}} against plan.",
-     "expected": {"refused": false}},
-    {"case_id": "narrative/in-bare-integer", "direction": "inbound", "payload": "The price was 41.",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/in-decimal", "direction": "inbound", "payload": "The price was 41.20.",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/in-year-is-still-a-digit", "direction": "inbound", "payload": "Q1 2026 was tight.",
-     "expected": {"refused": true}},
-    {"case_id": "narrative/in-spelled-word-is-not-caught", "direction": "inbound", "payload": "It was roughly forty megawatts.",
-     "expected": {"refused": false, "note": "the stated limit of this seam, asserted so it stays visible rather than being discovered later"}}
+    {
+      "case_id": "narrative/out-plain-text",
+      "direction": "outbound",
+      "payload": "the window was short",
+      "expected": {
+        "refused": false
+      }
+    },
+    {
+      "case_id": "narrative/out-decimal",
+      "direction": "outbound",
+      "payload": "the price was 41.20",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-comma-decimal",
+      "direction": "outbound",
+      "payload": "the spread was 3,5",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-unit-mw",
+      "direction": "outbound",
+      "payload": "50MW was available",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-unit-spaced",
+      "direction": "outbound",
+      "payload": "40 EUR/MWh",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-percent",
+      "direction": "outbound",
+      "payload": "utilisation 7%",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-float-value",
+      "direction": "outbound",
+      "payload_number": 41.2,
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-int-value",
+      "direction": "outbound",
+      "payload_number": 41,
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-zero",
+      "direction": "outbound",
+      "payload_number": 0,
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/out-bool-is-not-a-quantity",
+      "direction": "outbound",
+      "payload_bool": true,
+      "expected": {
+        "refused": false
+      }
+    },
+    {
+      "case_id": "narrative/in-placeholder-only",
+      "direction": "inbound",
+      "payload": "It delivered {{value}} against plan.",
+      "expected": {
+        "refused": false
+      }
+    },
+    {
+      "case_id": "narrative/in-bare-integer",
+      "direction": "inbound",
+      "payload": "The price was 41.",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/in-decimal",
+      "direction": "inbound",
+      "payload": "The price was 41.20.",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/in-year-is-still-a-digit",
+      "direction": "inbound",
+      "payload": "Q1 2026 was tight.",
+      "expected": {
+        "refused": true
+      }
+    },
+    {
+      "case_id": "narrative/in-spelled-word-is-not-caught",
+      "direction": "inbound",
+      "payload": "It was roughly forty megawatts.",
+      "expected": {
+        "refused": false,
+        "note": "the stated limit of this seam, asserted so it stays visible rather than being discovered later"
+      }
+    }
   ]
 }

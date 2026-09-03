@@ -1,15 +1,40 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "kind": "advice_constructibility",
-  "note": "Every implementation reports, for each cell, whether a type exists that can construct it. CLIENT_SPECIFIC x EXCHANGE_TRADED must report constructible=false, and must do so because no type exists -- not because a check refused the call.",
+  "note": "Every implementation reports, for each cell, whether an INSTANCE of it can be constructed. CLIENT_SPECIFIC x EXCHANGE_TRADED must report constructible=false. Fixtures cannot see the shape requirement in CONTRACT.md 1.1 -- that the cell be occupied by a named uninhabited type rather than left absent, and that a new type cannot claim it -- so each implementation carries local tests for those. See conformance/README.md.",
   "cases": [
-    {"case_id": "advice/generic-physical", "scope": "GENERIC", "subject": "PHYSICAL_ASSET",
-     "expected": {"constructible": true}},
-    {"case_id": "advice/generic-instrument", "scope": "GENERIC", "subject": "EXCHANGE_TRADED",
-     "expected": {"constructible": true}},
-    {"case_id": "advice/client-physical", "scope": "CLIENT_SPECIFIC", "subject": "PHYSICAL_ASSET",
-     "expected": {"constructible": true}},
-    {"case_id": "advice/client-instrument-FORBIDDEN", "scope": "CLIENT_SPECIFIC", "subject": "EXCHANGE_TRADED",
-     "expected": {"constructible": false, "reason": "investment advice under MiFID II Art. 4(1)(4); no type exists"}}
+    {
+      "case_id": "advice/generic-physical",
+      "scope": "GENERIC",
+      "subject": "PHYSICAL_ASSET",
+      "expected": {
+        "constructible": true
+      }
+    },
+    {
+      "case_id": "advice/generic-instrument",
+      "scope": "GENERIC",
+      "subject": "EXCHANGE_TRADED",
+      "expected": {
+        "constructible": true
+      }
+    },
+    {
+      "case_id": "advice/client-physical",
+      "scope": "CLIENT_SPECIFIC",
+      "subject": "PHYSICAL_ASSET",
+      "expected": {
+        "constructible": true
+      }
+    },
+    {
+      "case_id": "advice/client-instrument-FORBIDDEN",
+      "scope": "CLIENT_SPECIFIC",
+      "subject": "EXCHANGE_TRADED",
+      "expected": {
+        "constructible": false,
+        "reason": "investment advice under MiFID II Art. 4(1)(4); the cell is occupied by an uninhabited type and has no instances"
+      }
+    }
   ]
 }
